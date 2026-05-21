@@ -6,6 +6,7 @@ import {
   Heading,
   Hr,
   Html,
+  Img,
   Link,
   Preview,
   Section,
@@ -32,7 +33,7 @@ export const InviteEmail = ({
         <Container style={container}>
           {/* Header Banner */}
           <Section style={headerBanner}>
-            <Text style={logoText}>FF</Text>
+            <Img src={`${process.env.NEXT_PUBLIC_APP_URL || 'https://fatturefacili.com'}/emailgraphic.png`} width="600" alt="Fatture Facili" style={{ display: 'block', outline: 'none', border: 'none', textDecoration: 'none' }} />
           </Section>
           
           {/* Content */}
@@ -88,18 +89,9 @@ const container = {
 };
 
 const headerBanner = {
-  backgroundColor: '#4C753A', // dark green gradient approximation
-  backgroundImage: 'linear-gradient(to right, #335525, #4C753A, #335525)',
-  padding: '40px 0',
+  backgroundColor: '#ffffff',
+  padding: '0',
   textAlign: 'center' as const,
-};
-
-const logoText = {
-  color: '#ffffff',
-  fontSize: '48px',
-  fontWeight: 'bold',
-  letterSpacing: '-2px',
-  margin: '0',
 };
 
 const contentSection = {
