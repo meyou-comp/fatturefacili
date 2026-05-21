@@ -9,9 +9,16 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'FatturazioneIT — Fatturazione Elettronica Italiana',
+  title: 'Fatture Facili — Fatturazione Elettronica Semplice',
   description:
     'Software SaaS di fatturazione italiana completo. Fatture elettroniche SDI, gestione clienti, regime forfettario, asilo nido, comunicazioni 730.',
+  openGraph: {
+    images: ['/og-image.png'],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    images: ['/og-image.png'],
+  },
 };
 
 export default function RootLayout({
