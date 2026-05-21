@@ -1,0 +1,318 @@
+// ─────────────────────────────────────────────────────────────
+// FatturazioneIT — Schema Prisma (SQLite)
+// ─────────────────────────────────────────────────────────────
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ─── UTENTI & AUTH ──────────────────────────────────────────
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  passwordHash  String
+  nome          String
+  cognome       String
+  avatar        String?
+  emailVerified Boolean  @default(false)
+
+  organizations UserOrganization[]
+  refreshTokens RefreshToken[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model UserOrganization {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  role           String   @default("OPERATOR") // OWNER, ADMIN, ACCOUNTANT, OPERATOR, READONLY
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, organizationId])
+}
+
+model Invitation {
+  id             String   @id @default(cuid())
+  email          String
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  role           String   @default("OPERATOR")
+  token          String   @unique
+  status         String   @default("PENDING") // PENDING, ACCEPTED
+  expiresAt      DateTime
+
+  createdAt      DateTime @default(now())
+  
+  @@unique([email, organizationId])
+}
+
+// ─── ANAGRAFICA ─────────────────────────────────────────────
+
+model Organization {
+  id                String   @id @default(cuid())
+  ragioneSociale    String
+  partitaIva        String?  @unique
+  codiceFiscale     String   @unique
+  tipoSoggetto      String   // PERSONA_FISICA, PERSONA_GIURIDICA, etc.
+  regimeFiscale     String   // ORDINARIO, FORFETTARIO, etc.
+  tipoAttivita      String   // ASILO_NIDO, LIBERO_PROFESSIONISTA, etc.
+  piano             String   @default("BASE") // BASE, START, PRO
+  
+  // Campi per l'integrazione Stripe
+  stripeCustomerId       String?  @unique
+  stripeSubscriptionId   String?  @unique
+  stripePriceId          String?
+  stripeCurrentPeriodEnd DateTime?
+
+  // Indirizzo sede legale
+  indirizzo         String
+  cap               String
+  comune            String
+  provincia         String
+  paese             String   @default("IT")
+
+  // Contatti
+  email             String
+  pec               String?
+  telefono          String?
+  sito              String?
+
+  // SDI / Fattura Elettronica
+  codiceDestinatario String?
+  fatturaElettronica Boolean  @default(true)
+  intermediarioSDI  String?
+
+  // Dati bancari
+  iban              String?
+  bic               String?
+  intestatarioConto String?
+
+  // Logo e personalizzazione
+  logoUrl           String?
+  coloreAccento     String?  @default("#335525")
+  noteInFattura     String?
+
+  // Impostazioni fiscali inline (no tabella separata per SQLite)
+  coefficienteRedd  Float?
+  impostaForfettaria Float?
+  annoInizioRegime  Int?
+  ritenutaAcconto   Boolean  @default(false)
+  aliquotaRitenuta  Float?   @default(0.20)
+  cassaPrevidenziale String?
+  aliquotaCassa     Float?
+  bolloVirtuale     Boolean  @default(false)
+  importoBollo      Float?   @default(2.00)
+  sogliaBollo       Float?   @default(77.47)
+  splitPayment      Boolean  @default(false)
+
+  // Relazioni
+  users             UserOrganization[]
+  invitations       Invitation[]
+  clienti           Cliente[]
+  fatture           Fattura[]
+  prodotti          Prodotto[]
+  serieNumeri       SerieNumerazione[]
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Cliente {
+  id                String   @id @default(cuid())
+  organizationId    String
+  organization      Organization @relation(fields: [organizationId], references: [id])
+
+  tipoCliente       String   // PRIVATO, AZIENDA, PA, PROFESSIONISTA
+  ragioneSociale    String?
+  nome              String?
+  cognome           String?
+  codiceFiscale     String?
+  partitaIva        String?
+
+  // Indirizzo
+  indirizzo         String?
+  cap               String?
+  comune            String?
+  provincia         String?
+  paese             String   @default("IT")
+
+  // SDI
+  pec               String?
+  codiceDestinatario String?
+
+  // Contatti
+  email             String?
+  telefono          String?
+
+  note              String?
+
+  fatture           Fattura[]
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([organizationId])
+}
+
+// ─── FATTURAZIONE ───────────────────────────────────────────
+
+model SerieNumerazione {
+  id             String   @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  nome           String
+  prefisso       String?
+  anno           Int
+  contatore      Int      @default(0)
+  formato        String   @default("{PREFISSO}{ANNO}/{NUMERO}")
+  lunghezzaNumero Int     @default(4)
+
+  fatture        Fattura[]
+
+  @@unique([organizationId, nome, anno])
+}
+
+model Fattura {
+  id                String   @id @default(cuid())
+  organizationId    String
+  organization      Organization @relation(fields: [organizationId], references: [id])
+  clienteId         String
+  cliente           Cliente @relation(fields: [clienteId], references: [id])
+  serieId           String?
+  serie             SerieNumerazione? @relation(fields: [serieId], references: [id])
+
+  numero            String
+  progressivo       Int
+
+  tipoDocumento     String   // FATTURA, NOTA_CREDITO, PARCELLA, etc.
+  direzione         String   @default("USCITA") // ENTRATA, USCITA
+
+  dataEmissione     DateTime
+  dataScadenza      DateTime?
+  dataPagamento     DateTime?
+
+  stato             String   // BOZZA, EMESSA, PAGATA, SCADUTA, etc.
+
+  oggettoFattura    String?
+
+  righe             RigaFattura[]
+
+  // Totali (Float per SQLite)
+  imponibile        Float    @default(0)
+  totaleIVA         Float    @default(0)
+  totale            Float    @default(0)
+  totalePagato      Float    @default(0)
+
+  importoRitenuta   Float?
+  importoBollo      Float?
+  importoCassa      Float?
+  nettoAPagare      Float    @default(0)
+
+  metodoPagamento   String?  // BONIFICO, CONTANTI, POS, etc.
+  pagamenti         Pagamento[]
+
+  note              String?
+  noteInterne       String?
+
+  // Campi per Asili Nido / Spese Scolastiche / Bonus INPS
+  alunnoNomeCognome   String?
+  alunnoCodiceFiscale String?
+  isRettaScolastica   Boolean  @default(false)
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([organizationId])
+  @@index([clienteId])
+  @@index([stato])
+  @@index([dataEmissione])
+}
+
+model RigaFattura {
+  id              String   @id @default(cuid())
+  fatturaId       String
+  fattura         Fattura @relation(fields: [fatturaId], references: [id], onDelete: Cascade)
+  prodottoId      String?
+  prodotto        Prodotto? @relation(fields: [prodottoId], references: [id])
+
+  ordine          Int
+  descrizione     String
+  quantita        Float    @default(1)
+  unitaMisura     String?
+  prezzoUnitario  Float    @default(0)
+  sconto          Float?   @default(0)
+
+  aliquotaIVA     Float    @default(22)
+  naturaIVA       String?
+
+  imponibile      Float    @default(0)
+  importoIVA      Float    @default(0)
+  totale          Float    @default(0)
+}
+
+model Prodotto {
+  id              String   @id @default(cuid())
+  organizationId  String
+  organization    Organization @relation(fields: [organizationId], references: [id])
+
+  codice          String?
+  nome            String
+  descrizione     String?
+
+  prezzoUnitario  Float    @default(0)
+  aliquotaIVA     Float    @default(22)
+  naturaIVA       String?
+  unitaMisura     String?
+
+  categoria       String?
+  
+  // Campi per il Magazzino
+  tipo            String   @default("PRODOTTO") // PRODOTTO, SERVIZIO
+  tracciaMagazzino Boolean  @default(false)
+  giacenza        Float    @default(0)
+  sogliaScorta    Float    @default(0)
+
+  righe           RigaFattura[]
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([organizationId])
+}
+
+// ─── PAGAMENTI ──────────────────────────────────────────────
+
+model Pagamento {
+  id              String   @id @default(cuid())
+  fatturaId       String
+  fattura         Fattura @relation(fields: [fatturaId], references: [id], onDelete: Cascade)
+
+  data            DateTime
+  importo         Float
+  metodo          String   // BONIFICO, CONTANTI, POS, etc.
+  riferimento     String?
+  note            String?
+
+  createdAt       DateTime @default(now())
+}

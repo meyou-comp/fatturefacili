@@ -1,0 +1,25 @@
+{
+  "name": "fatturazioneit",
+  "private": true,
+  "packageManager": "pnpm@9.15.4",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,css,md}\"",
+    "db:generate": "pnpm --filter @fatturazioneit/db prisma generate",
+    "db:push": "pnpm --filter @fatturazioneit/db prisma db push",
+    "db:migrate": "pnpm --filter @fatturazioneit/db prisma migrate dev",
+    "db:seed": "pnpm --filter @fatturazioneit/db prisma db seed",
+    "db:studio": "pnpm --filter @fatturazioneit/db prisma studio",
+    "clean": "turbo run clean && rm -rf node_modules"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.0",
+    "typescript": "^5.7.0",
+    "prettier": "^3.4.0",
+    "@types/node": "^22.10.0"
+  }
+}
