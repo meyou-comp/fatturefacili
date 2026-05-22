@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { CheckCircle2, Zap, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PageHeader } from '@/components/shared/page-header';
@@ -8,11 +9,15 @@ import { loadStripe } from '@stripe/stripe-js';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '');
 
-export default function GestisciPianoPage() {
+function GestisciPianoContent() {
+  const searchParams = useSearchParams();
+  const checkoutPlan = searchParams.get('checkoutPlan');
+  const checkoutCycle = searchParams.get('checkoutCycle') as 'monthly' | 'annual' | null;
+  const hasTriggeredCheckout = useRef(false);
   const [loading, setLoading] = useState(true);
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
   const [org, setOrg] = useState<any>(null);
-  const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
+  const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>(checkoutCycle || 'monthly');
 
   useEffect(() => {
     fetch('/api/organization')
@@ -53,6 +58,19 @@ export default function GestisciPianoPage() {
       setLoadingAction(null);
     }
   };
+
+  useEffect(() => {
+    if (!loading && checkoutPlan && checkoutPlan !== 'BASE' && !hasTriggeredCheckout.current) {
+      hasTriggeredCheckout.current = true;
+      const priceId = billingCycle === 'monthly'
+        ? (checkoutPlan === 'START' ? process.env.NEXT_PUBLIC_STRIPE_START_MONTHLY_PRICE_ID : process.env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID)
+        : (checkoutPlan === 'START' ? process.env.NEXT_PUBLIC_STRIPE_START_ANNUAL_PRICE_ID : process.env.NEXT_PUBLIC_STRIPE_PRO_ANNUAL_PRICE_ID);
+        
+      if (priceId) {
+        handleCheckout(priceId as string, checkoutPlan);
+      }
+    }
+  }, [loading, checkoutPlan, billingCycle]);
 
   const handlePortal = async (actionId: string) => {
     setLoadingAction(actionId);
@@ -296,5 +314,17 @@ export default function GestisciPianoPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function GestisciPianoPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex h-64 items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    }>
+      <GestisciPianoContent />
+    </Suspense>
   );
 }

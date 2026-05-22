@@ -5,7 +5,7 @@ import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
   apiKey: "AIzaSyAPkxa3F-0DDdYnq_13cvQE1smf4S470-8",
-  authDomain: "fatture-facili-2ce2b.firebaseapp.com",
+  authDomain: "fatturefacili.com",
   projectId: "fatture-facili-2ce2b",
   storageBucket: "fatture-facili-2ce2b.firebasestorage.app",
   messagingSenderId: "661444715808",

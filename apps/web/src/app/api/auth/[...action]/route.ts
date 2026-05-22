@@ -183,7 +183,7 @@ async function firebaseSync(req: NextRequest) {
       const org = await prisma.organization.create({
         data: {
           ragioneSociale: 'La mia Azienda',
-          codiceFiscale: '00000000000',
+          codiceFiscale: `DUMMY-${user.id.substring(0, 10)}`,
           tipoSoggetto: 'PERSONA_FISICA',
           regimeFiscale: 'ORDINARIO',
           tipoAttivita: 'ALTRO',

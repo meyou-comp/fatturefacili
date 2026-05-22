@@ -69,7 +69,7 @@ export default function LandingPage() {
     { title: 'Invia e ricevi fatture', desc: 'Gestisci la fiscalità in maniera semplice come dovrebbe.', img: '/Simple.svg' },
     { title: 'Monitora la situazione', desc: "Vedi l'overview completa della tua attività da un'unica dashboard.", img: '/Feature Graph Container.svg' },
     { title: 'Fattura convenientemente', desc: 'Il servizio più facile e conveniente sul mercato.', img: '/Fatturaconvenientemente.svg' },
-    { title: 'Gruppi e Collaborazioni', desc: 'Collabora con il tuo team e con il tuo commercialista.', img: '/Gruppiecollaborazione.svg' },
+    { title: 'Gruppi e Collaborazioni', desc: 'Collabora con il tuo team e con il tuo commercialista.', img: '/gruppiecollaborazione.svg' },
     { title: 'Importa fatture in un\'attimo', desc: 'Importa i documenti fiscali dal tuo vecchio provider.', img: '/SemiCirle.svg' },
   ];
 
@@ -77,9 +77,9 @@ export default function LandingPage() {
   const loopingCards = [...cards, ...cards];
 
   const plans = [
-    { name: 'Solo', price: 'Free', features: ['20 Fatture / anno', 'Nessun gruppo', 'Fatture Standard', 'Supporto standard'] },
-    { name: 'Start', price: billingCycle === 'monthly' ? '1,69€ / mese' : '17,99€ / anno', savings: billingCycle === 'annual' ? "risparmi l'11%!" : null, features: ['100 Fatture / anno', 'Gruppo (3 persone)', 'Fatture Custom', 'Supporto standard'] },
-    { name: 'Pro', price: billingCycle === 'monthly' ? '3,69€ / mese' : '27,99€ / anno', savings: billingCycle === 'annual' ? "risparmi il 36%!" : null, features: ['Fatture illimitate', 'Gruppo (10 persone)', 'Modulo Magazzino', 'Supporto prioritario'] },
+    { id: 'BASE', name: 'Solo', price: 'Free', features: ['20 Fatture / anno', 'Nessun gruppo', 'Fatture Standard', 'Supporto standard'] },
+    { id: 'START', name: 'Start', price: billingCycle === 'monthly' ? '1,69€ / mese' : '17,99€ / anno', savings: billingCycle === 'annual' ? "risparmi l'11%!" : null, features: ['100 Fatture / anno', 'Gruppo (3 persone)', 'Fatture Custom', 'Supporto standard'] },
+    { id: 'PRO', name: 'Pro', price: billingCycle === 'monthly' ? '3,69€ / mese' : '27,99€ / anno', savings: billingCycle === 'annual' ? "risparmi il 36%!" : null, features: ['Fatture illimitate', 'Gruppo (10 persone)', 'Modulo Magazzino', 'Supporto prioritario'] },
   ];
 
   return (
@@ -250,7 +250,7 @@ export default function LandingPage() {
 
                   <div className="mt-10 flex justify-center">
                     <Link
-                      href="/login"
+                      href={`/register?plan=${plan.id}&cycle=${billingCycle}`}
                       className="flex items-center justify-center text-[13px] font-bold text-black hover:opacity-90 transition-all"
                       style={{ width: 191, height: 40, padding: '8px 10px', borderRadius: 10, background: '#ABF88D', gap: 8 }}
                     >

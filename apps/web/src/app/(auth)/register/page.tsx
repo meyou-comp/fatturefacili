@@ -1,15 +1,19 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Logo } from '@/components/shared/logo';
 import { auth, db } from '@/lib/firebase';
 import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 
-export default function RegisterPage() {
+function RegisterContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const plan = searchParams.get('plan');
+  const cycle = searchParams.get('cycle');
+  
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -42,7 +46,11 @@ export default function RegisterPage() {
         body: JSON.stringify({ email, nome })
       });
 
-      router.push('/dashboard');
+      let redirectUrl = '/onboarding';
+      if (plan && cycle) {
+        redirectUrl += `?plan=${plan}&cycle=${cycle}`;
+      }
+      router.push(redirectUrl);
     } catch (err: any) {
       console.error(err);
       setError(err.message || 'Errore durante la registrazione');
@@ -78,7 +86,11 @@ export default function RegisterPage() {
         body: JSON.stringify({ email: user.email, nome: user.displayName })
       });
 
-      router.push('/dashboard');
+      let redirectUrl = '/onboarding';
+      if (plan && cycle) {
+        redirectUrl += `?plan=${plan}&cycle=${cycle}`;
+      }
+      router.push(redirectUrl);
     } catch (err: any) {
       console.error(err);
       setError('Errore durante la registrazione con Google');
@@ -205,5 +217,13 @@ export default function RegisterPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-white" />}>
+      <RegisterContent />
+    </Suspense>
   );
 }
