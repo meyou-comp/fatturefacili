@@ -30,14 +30,14 @@ function RegisterContent() {
       const user = userCredential.user;
 
       try {
-        await setDoc(doc(db, 'users', user.uid), {
+        setDoc(doc(db, 'users', user.uid), {
           nome,
           email,
           ruolo: 'OWNER',
           createdAt: new Date().toISOString()
-        });
+        }).catch(err => console.warn('Errore Firestore in background', err));
       } catch (err) {
-        console.warn('Impossibile salvare su Firestore (probabile DB non inizializzato). Procedo...', err);
+        console.warn('Impossibile salvare su Firestore. Procedo...', err);
       }
 
       await fetch('/api/auth/firebase-sync', {
@@ -70,14 +70,14 @@ function RegisterContent() {
       // In a real app we might want to check if they already exist,
       // but setDoc with merge: true is safe enough for this demo
       try {
-        await setDoc(doc(db, 'users', user.uid), {
+        setDoc(doc(db, 'users', user.uid), {
           nome: user.displayName || 'Utente Google',
           email: user.email,
           ruolo: 'OWNER',
           createdAt: new Date().toISOString()
-        }, { merge: true });
+        }, { merge: true }).catch(err => console.warn('Errore Firestore in background', err));
       } catch (err) {
-        console.warn('Impossibile salvare su Firestore (probabile DB non inizializzato). Procedo...', err);
+        console.warn('Impossibile salvare su Firestore. Procedo...', err);
       }
 
       await fetch('/api/auth/firebase-sync', {
