@@ -1,0 +1,5 @@
+env:
+  - variable: HOSTNAME
+    value: "0.0.0.0"
+    availability:
+      - RUNTIME
