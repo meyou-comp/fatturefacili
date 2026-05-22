@@ -33,7 +33,7 @@ function LogoSVG() {
 export default function LandingPage() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
-  const sfPro = "'SF Pro Display', Inter, sans-serif";
+  const sfPro = "var(--font-sfpro), Inter, sans-serif";
 
   useEffect(() => {
     const el = scrollRef.current;

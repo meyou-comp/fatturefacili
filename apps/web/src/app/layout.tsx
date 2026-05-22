@@ -1,11 +1,29 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import localFont from 'next/font/local';
 import { Providers } from '@/components/providers';
 import './globals.css';
 
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
+});
+
+const sfPro = localFont({
+  src: [
+    {
+      path: '../../public/SFPRODISPLAYREGULAR.OTF',
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: '../../public/SFPRODISPLAYSEMIBOLD.otf',
+      weight: '600',
+      style: 'normal',
+    },
+  ],
+  variable: '--font-sfpro',
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -28,7 +46,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="it" className="light" style={{ colorScheme: 'light' }} suppressHydrationWarning>
-      <body className={`${inter.variable} font-sans antialiased bg-white text-black`}>
+      <body className={`${inter.variable} ${sfPro.variable} font-sans antialiased bg-white text-black`}>
         <Providers>{children}</Providers>
       </body>
     </html>

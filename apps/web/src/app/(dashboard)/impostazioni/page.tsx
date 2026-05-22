@@ -151,7 +151,7 @@ function GestisciPianoContent() {
           <div className="rounded-[20px] border-[1.5px] border-border bg-white p-8 flex flex-col sm:flex-row items-center justify-between gap-6 relative overflow-hidden">
             <div className="space-y-1">
               <span className="text-[14px] font-bold text-muted-foreground">Piano attuale</span>
-              <h2 className="text-4xl text-foreground" style={{ fontFamily: "'SF Pro Display', sans-serif", fontWeight: 400 }}>
+              <h2 className="text-4xl text-foreground" style={{ fontFamily: "var(--font-sfpro), sans-serif", fontWeight: 400 }}>
                 {pianoAttuale === 'BASE' ? 'Solo' : pianoAttuale === 'START' ? 'Start' : 'Pro'}
               </h2>
               <p className="text-[15px] font-bold text-foreground mt-1">
@@ -278,7 +278,7 @@ function GestisciPianoContent() {
                   )}
                 >
                   <div className="flex flex-col gap-1 mb-5">
-                    <h4 className="text-[22px] text-foreground" style={{ fontFamily: "'SF Pro Display', sans-serif", fontWeight: 400 }}>{p.name}</h4>
+                    <h4 className="text-[22px] text-foreground" style={{ fontFamily: "var(--font-sfpro), sans-serif", fontWeight: 400 }}>{p.name}</h4>
                     <span className="font-bold text-[14px] text-foreground flex items-center gap-2">
                       {p.badge} 
                       {p.savings && <span className="text-[#335525] bg-[#ABF88D]/30 px-2 py-0.5 rounded text-[11px] font-black uppercase tracking-wider">{p.savings}</span>}
