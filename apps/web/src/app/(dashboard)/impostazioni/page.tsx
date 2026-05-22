@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { PageHeader } from '@/components/shared/page-header';
 import { loadStripe } from '@stripe/stripe-js';
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '');
+const stripePromise = loadStripe('pk_live_51TZXyFQA2C6te0NVfDsjOfsGRsI1aNZlSSSqyNXSa4SBkqHGUDrhjwTfr6q7K4cdjCBFwVBblRwA69v2NhVqKDdU00S2b3j5pQ');
 
 function GestisciPianoContent() {
   const searchParams = useSearchParams();
@@ -63,8 +63,8 @@ function GestisciPianoContent() {
     if (!loading && checkoutPlan && checkoutPlan !== 'BASE' && !hasTriggeredCheckout.current) {
       hasTriggeredCheckout.current = true;
       const priceId = billingCycle === 'monthly'
-        ? (checkoutPlan === 'START' ? process.env.NEXT_PUBLIC_STRIPE_START_MONTHLY_PRICE_ID : process.env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID)
-        : (checkoutPlan === 'START' ? process.env.NEXT_PUBLIC_STRIPE_START_ANNUAL_PRICE_ID : process.env.NEXT_PUBLIC_STRIPE_PRO_ANNUAL_PRICE_ID);
+        ? (checkoutPlan === 'START' ? 'price_1TZY2aQBfpA6UWr6QSpv1pPl' : 'price_1TZY5GQBfpA6UWr614ZIdKKr')
+        : (checkoutPlan === 'START' ? 'price_1TZY6fQBfpA6UWr6cimWYsS8' : 'price_1TZY7sQBfpA6UWr6IFcSHdgM');
         
       if (priceId) {
         handleCheckout(priceId as string, checkoutPlan);
@@ -118,9 +118,9 @@ function GestisciPianoContent() {
       badge: billingCycle === 'monthly' ? '1,69€ / mese' : '17,99€ / anno',
       savings: billingCycle === 'annual' ? "risparmi l'11%!" : null,
       features: ['100 Fatture / anno', 'Gruppo (3 persone)', 'Fatture Custom', 'Supporto standard'],
-      priceId: billingCycle === 'monthly' 
-        ? process.env.NEXT_PUBLIC_STRIPE_START_MONTHLY_PRICE_ID 
-        : process.env.NEXT_PUBLIC_STRIPE_START_ANNUAL_PRICE_ID,
+      priceId: billingCycle === 'monthly'
+        ? 'price_1TZY2aQBfpA6UWr6QSpv1pPl'
+        : 'price_1TZY6fQBfpA6UWr6cimWYsS8',
       priceLabel: 'Passa a Start',
     },
     {
@@ -130,8 +130,8 @@ function GestisciPianoContent() {
       savings: billingCycle === 'annual' ? "risparmi il 36%!" : null,
       features: ['Fatture illimitate', 'Gruppo (10 persone)', 'Modulo Magazzino', 'Supporto prioritario'],
       priceId: billingCycle === 'monthly'
-        ? process.env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID
-        : process.env.NEXT_PUBLIC_STRIPE_PRO_ANNUAL_PRICE_ID,
+        ? 'price_1TZY5GQBfpA6UWr614ZIdKKr'
+        : 'price_1TZY7sQBfpA6UWr6IFcSHdgM',
       priceLabel: 'Passa a Pro',
     },
   ];
