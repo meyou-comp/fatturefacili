@@ -3,6 +3,7 @@
   "private": true,
   "packageManager": "pnpm@9.15.4",
   "scripts": {
+    "start": "cd apps/web/.next/standalone && node apps/web/server.js",
     "dev": "turbo run dev",
     "build": "turbo run build",
     "lint": "turbo run lint",
