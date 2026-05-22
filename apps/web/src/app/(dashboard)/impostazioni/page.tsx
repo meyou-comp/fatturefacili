@@ -63,8 +63,8 @@ function GestisciPianoContent() {
     if (!loading && checkoutPlan && checkoutPlan !== 'BASE' && !hasTriggeredCheckout.current) {
       hasTriggeredCheckout.current = true;
       const priceId = billingCycle === 'monthly'
-        ? (checkoutPlan === 'START' ? 'price_1TZY2aQBfpA6UWr6QSpv1pPl' : 'price_1TZY5GQBfpA6UWr614ZIdKKr')
-        : (checkoutPlan === 'START' ? 'price_1TZY6fQBfpA6UWr6cimWYsS8' : 'price_1TZY7sQBfpA6UWr6IFcSHdgM');
+        ? (checkoutPlan === 'START' ? 'price_1TZsAUQA2C6te0NVtjx1X3By' : 'price_1TZsAQQA2C6te0NVW2w5DO5J')
+        : (checkoutPlan === 'START' ? 'price_1TZsAQQA2C6te0NV5YMlOAB6' : 'price_1TZsATQA2C6te0NVLNqOb1DK');
         
       if (priceId) {
         handleCheckout(priceId as string, checkoutPlan);
@@ -119,8 +119,8 @@ function GestisciPianoContent() {
       savings: billingCycle === 'annual' ? "risparmi l'11%!" : null,
       features: ['100 Fatture / anno', 'Gruppo (3 persone)', 'Fatture Custom', 'Supporto standard'],
       priceId: billingCycle === 'monthly'
-        ? 'price_1TZY2aQBfpA6UWr6QSpv1pPl'
-        : 'price_1TZY6fQBfpA6UWr6cimWYsS8',
+        ? 'price_1TZsAUQA2C6te0NVtjx1X3By'
+        : 'price_1TZsAQQA2C6te0NV5YMlOAB6',
       priceLabel: 'Passa a Start',
     },
     {
@@ -130,8 +130,8 @@ function GestisciPianoContent() {
       savings: billingCycle === 'annual' ? "risparmi il 36%!" : null,
       features: ['Fatture illimitate', 'Gruppo (10 persone)', 'Modulo Magazzino', 'Supporto prioritario'],
       priceId: billingCycle === 'monthly'
-        ? 'price_1TZY5GQBfpA6UWr614ZIdKKr'
-        : 'price_1TZY7sQBfpA6UWr6IFcSHdgM',
+        ? 'price_1TZsAQQA2C6te0NVW2w5DO5J'
+        : 'price_1TZsATQA2C6te0NVLNqOb1DK',
       priceLabel: 'Passa a Pro',
     },
   ];
