@@ -66,7 +66,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-white">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-white px-4">
       <Link href="/" className="absolute top-6 left-6 z-50 flex items-center gap-2 rounded-full bg-white/80 backdrop-blur-md px-4 py-2 text-[13px] font-bold text-foreground shadow-sm transition-all hover:bg-white hover:scale-105 border border-black/5">
         <ArrowLeft className="h-4 w-4" /> Torna alla Home
       </Link>
@@ -82,7 +82,7 @@ export default function LoginPage() {
       <div className="absolute inset-0 bg-white/30 backdrop-blur-[2px]"></div>
       <div className="absolute inset-0 bg-gradient-to-t from-white via-white/60 to-transparent"></div>
 
-      <div className="relative z-10 w-full max-w-[400px] space-y-8 rounded-2xl bg-white p-10 shadow-xl border border-white/50">
+      <div className="relative z-10 w-full max-w-[400px] space-y-8 rounded-2xl bg-white p-6 sm:p-10 shadow-xl border border-white/50">
         <div className="flex flex-col items-center gap-4">
           <Logo className="h-8 w-auto" />
           <p className="text-[13px] text-muted-foreground">Accedi al tuo account</p>

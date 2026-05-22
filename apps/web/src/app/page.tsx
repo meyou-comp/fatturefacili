@@ -2,6 +2,7 @@
 
 import { useRef, useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import RealismButton from '@/components/ui/shiny-borders-button';
 
@@ -189,7 +190,7 @@ export default function LandingPage() {
           </h2>
         </div>
         <div className="relative min-h-[350px] md:min-h-full">
-          <img src="/workspace_billing.png" alt="Workspace" className="absolute inset-0 h-full w-full object-cover" />
+          <Image src="/workspace_billing.png" alt="Workspace" fill className="object-cover" priority sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
         </div>
       </section>
 

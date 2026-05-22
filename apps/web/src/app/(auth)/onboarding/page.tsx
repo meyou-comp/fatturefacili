@@ -50,7 +50,7 @@ function OnboardingContent() {
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-white py-12">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-white px-4 py-12">
       <video
         autoPlay
         muted
@@ -63,7 +63,7 @@ function OnboardingContent() {
       <div className="absolute inset-0 bg-white/30 backdrop-blur-[2px]"></div>
       <div className="absolute inset-0 bg-gradient-to-t from-white via-white/60 to-transparent"></div>
 
-      <div className="relative z-10 w-full max-w-[400px] space-y-8 rounded-2xl bg-white p-10 shadow-xl border border-white/50">
+      <div className="relative z-10 w-full max-w-[400px] space-y-8 rounded-2xl bg-white p-6 sm:p-10 shadow-xl border border-white/50">
         <div className="flex flex-col items-center gap-4">
           <Logo className="h-8 w-auto" />
           <h2 className="text-xl font-semibold text-foreground mt-2">Benvenuto a bordo!</h2>
