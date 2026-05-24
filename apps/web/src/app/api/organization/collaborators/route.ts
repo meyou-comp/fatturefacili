@@ -93,8 +93,9 @@ export async function POST(req: NextRequest) {
     });
 
     // Send email using Resend
-    const host = req.headers.get('host') || 'localhost:3000';
-    const protocol = req.headers.get('x-forwarded-proto') || (host.includes('localhost') ? 'http' : 'https');
+    const forwardedHost = req.headers.get('x-forwarded-host')?.split(',')[0].trim();
+    const host = forwardedHost || req.headers.get('host') || 'localhost:3000';
+    const protocol = req.headers.get('x-forwarded-proto')?.split(',')[0].trim() || (host.includes('localhost') ? 'http' : 'https');
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || `${protocol}://${host}`;
     const inviteLink = `${appUrl}/invite/${token}`;
 
