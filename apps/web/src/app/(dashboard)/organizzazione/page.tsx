@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Save, Loader2, CheckCircle2, UserPlus, Trash2, Palette, Image as ImageIcon, UploadCloud } from 'lucide-react';
+import { Save, Loader2, CheckCircle2, UserPlus, Trash2, Palette, Image as ImageIcon, UploadCloud, Copy } from 'lucide-react';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage } from '@/lib/firebase';
 import { BuildingApartment, BuildingFill, CreditCardIcon, CreditCardIconFill, UsersIcon, UsersIconFill } from '@/components/icons';
@@ -46,6 +46,7 @@ export default function OrganizzazionePage() {
   const [collabRole, setCollabRole] = useState<'ADMIN' | 'OPERATOR' | 'ACCOUNTANT' | 'READONLY'>('ACCOUNTANT');
   const [collabs, setCollabs] = useState<any[]>([]);
   const [collabSuccess, setCollabSuccess] = useState('');
+  const [inviteLinkState, setInviteLinkState] = useState('');
   const [collabLoading, setCollabLoading] = useState(false);
   const [loadingCollabs, setLoadingCollabs] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
@@ -143,10 +144,12 @@ export default function OrganizzazionePage() {
       
       if (!res.ok) throw new Error(data.error);
       
-      setCollabSuccess(`Invito inviato correttamente a ${collabEmail}!`);
+      setCollabSuccess(`Invito creato correttamente per ${collabEmail}! Se l'email non arriva, condividi il link qui sotto.`);
+      setInviteLinkState(data.inviteLink || '');
       setCollabEmail('');
       loadCollaborators();
-      setTimeout(() => setCollabSuccess(''), 3000);
+      // setTimeout(() => setCollabSuccess(''), 3000); // Do not clear success message so user can copy link
+
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -449,9 +452,32 @@ export default function OrganizzazionePage() {
               </div>
 
               {collabSuccess && (
-                <div className="flex items-center gap-2 rounded-lg bg-green-50 px-4 py-3 text-[13px] text-green-800 font-semibold animate-fade-in">
-                  <CheckCircle2 className="h-4 w-4" />
-                  {collabSuccess}
+                <div className="flex flex-col gap-2 rounded-lg bg-green-50 px-4 py-3 animate-fade-in border border-green-200">
+                  <div className="flex items-center gap-2 text-[13px] text-green-800 font-semibold">
+                    <CheckCircle2 className="h-4 w-4" />
+                    {collabSuccess}
+                  </div>
+                  {inviteLinkState && (
+                    <div className="flex items-center gap-2 mt-1">
+                      <input 
+                        type="text" 
+                        readOnly 
+                        value={inviteLinkState} 
+                        className="flex-1 h-8 px-2 text-[11px] font-mono bg-white border border-green-200 rounded outline-none text-muted-foreground"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigator.clipboard.writeText(inviteLinkState);
+                          alert('Link copiato negli appunti!');
+                        }}
+                        className="flex items-center gap-1.5 h-8 px-3 bg-white border border-green-200 rounded text-[11px] font-bold text-green-800 hover:bg-green-100 transition-colors"
+                      >
+                        <Copy className="h-3 w-3" />
+                        Copia Link
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
 

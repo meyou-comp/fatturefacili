@@ -112,7 +112,7 @@ export async function POST(req: NextRequest) {
       // just log it so the user knows.
     }
 
-    return NextResponse.json({ success: true, inviteId: invite.id });
+    return NextResponse.json({ success: true, inviteId: invite.id, inviteLink });
   } catch (error: any) {
     console.error('POST invite error:', error);
     return NextResponse.json({ error: 'Errore interno' }, { status: 500 });

@@ -1,0 +1,172 @@
+'use client';
+
+import { useState, Suspense } from 'react';
+import Link from 'next/link';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { ArrowLeft } from 'lucide-react';
+import { Logo } from '@/components/shared/logo';
+
+function ResetPasswordForm() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const token = searchParams.get('token');
+
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setSuccess(false);
+
+    if (!token) {
+      setError('Token di reset mancante.');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError('Le password non coincidono.');
+      return;
+    }
+
+    if (password.length < 8) {
+      setError('La password deve contenere almeno 8 caratteri.');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const res = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, password })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Errore durante la reimpostazione della password');
+      }
+
+      setSuccess(true);
+      setTimeout(() => {
+        router.push('/login');
+      }, 3000);
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!token) {
+    return (
+      <div className="space-y-4 text-center">
+        <div className="rounded-lg bg-red-50 px-4 py-3 text-[13px] text-red-600 font-semibold border border-red-200">
+          Token di reset mancante o non valido.
+        </div>
+        <Link href="/forgot-password" className="inline-block text-[13px] font-bold text-primary-dark hover:underline mt-4">
+          Richiedi un nuovo link
+        </Link>
+      </div>
+    );
+  }
+
+  if (success) {
+    return (
+      <div className="space-y-4 text-center">
+        <div className="rounded-lg bg-green-50 px-4 py-3 text-[13px] text-green-800 font-semibold border border-green-200">
+          Password reimpostata con successo! Verrai reindirizzato al login...
+        </div>
+        <Link href="/login" className="inline-block text-[13px] font-bold text-primary-dark hover:underline mt-4">
+          Torna al Login
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      {error && (
+        <div className="rounded-lg bg-red-50 px-4 py-3 text-[13px] text-red-600">
+          {error}
+        </div>
+      )}
+
+      <div className="space-y-1.5">
+        <label className="text-[12px] font-medium text-foreground" htmlFor="password">
+          Nuova Password
+        </label>
+        <input
+          id="password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="h-10 w-full rounded-lg border border-border bg-white px-3 text-[13px] text-foreground outline-none transition-colors focus:border-primary-dark focus:ring-1 focus:ring-primary-dark"
+          placeholder="••••••••"
+          required
+        />
+      </div>
+
+      <div className="space-y-1.5">
+        <label className="text-[12px] font-medium text-foreground" htmlFor="confirmPassword">
+          Conferma Nuova Password
+        </label>
+        <input
+          id="confirmPassword"
+          type="password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          className="h-10 w-full rounded-lg border border-border bg-white px-3 text-[13px] text-foreground outline-none transition-colors focus:border-primary-dark focus:ring-1 focus:ring-primary-dark"
+          placeholder="••••••••"
+          required
+        />
+      </div>
+
+      <button
+        type="submit"
+        disabled={loading}
+        className="flex h-10 w-full items-center justify-center rounded-lg bg-primary font-semibold text-[13px] text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+      >
+        {loading ? 'Reimpostazione...' : 'Reimposta Password'}
+      </button>
+    </form>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-white px-4">
+      <Link href="/login" className="absolute top-6 left-6 z-50 flex items-center gap-2 rounded-full bg-white/80 backdrop-blur-md px-4 py-2 text-[13px] font-bold text-foreground shadow-sm transition-all hover:bg-white hover:scale-105 border border-black/5">
+        <ArrowLeft className="h-4 w-4" /> Torna al Login
+      </Link>
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="absolute inset-0 h-full w-full object-cover opacity-30"
+      >
+        <source src="https://firebasestorage.googleapis.com/v0/b/fatture-facili-2ce2b.firebasestorage.app/o/0520.mp4?alt=media&token=6a0e32d5-eb92-4b88-b4a0-d45d2d6a3dab" type="video/mp4" />
+      </video>
+      <div className="absolute inset-0 bg-white/30 backdrop-blur-[2px]"></div>
+      <div className="absolute inset-0 bg-gradient-to-t from-white via-white/60 to-transparent"></div>
+
+      <div className="relative z-10 w-full max-w-[400px] space-y-8 rounded-2xl bg-white p-6 sm:p-10 shadow-xl border border-white/50">
+        <div className="flex flex-col items-center gap-4">
+          <Logo className="h-8 w-auto" />
+          <p className="text-[13px] text-muted-foreground text-center">Scegli una nuova password sicura per il tuo account</p>
+        </div>
+
+        <Suspense fallback={<div className="text-center text-[13px] text-muted-foreground">Caricamento...</div>}>
+          <ResetPasswordForm />
+        </Suspense>
+      </div>
+    </div>
+  );
+}
