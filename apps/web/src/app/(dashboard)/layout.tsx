@@ -14,9 +14,9 @@ export default async function DashboardLayout({
   return (
     <div className="flex min-h-screen bg-white">
       <Sidebar />
-      <div className="ml-[var(--sidebar-width)] flex flex-1 flex-col">
+      <div className="flex flex-1 flex-col w-full md:ml-[var(--sidebar-width)] overflow-x-hidden">
         <Topbar user={user} />
-        <main className="flex-1 px-8 pb-8">{children}</main>
+        <main className="flex-1 px-4 md:px-8 pb-8">{children}</main>
       </div>
     </div>
   );

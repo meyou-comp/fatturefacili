@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronDown, LogOut, Settings } from 'lucide-react';
+import { ChevronDown, LogOut, Settings, Menu, X, Home, Users, FileText, Calendar, Box, Package, BookOpen, Building2 } from 'lucide-react';
 import Link from 'next/link';
 import { BellIcon, NotificationFill } from '@/components/icons';
 
@@ -26,6 +26,7 @@ export function Topbar({ user }: TopbarProps) {
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isOrgMenuOpen, setIsOrgMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [switching, setSwitching] = useState(false);
 
   const handleLogout = async () => {
@@ -54,9 +55,15 @@ export function Topbar({ user }: TopbarProps) {
   };
 
   return (
-    <header className="flex h-16 items-center justify-between gap-4 px-8">
+    <header className="flex h-16 items-center justify-between gap-2 px-4 md:px-8 sticky top-0 bg-white z-30">
       {/* Selettore Organizzazione a Sinistra */}
-      <div className="flex items-center">
+      <div className="flex items-center gap-2">
+        <button 
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="md:hidden flex items-center justify-center rounded-md p-1.5 hover:bg-gray-100 transition-colors"
+        >
+          {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        </button>
         {user?.organizations && user.organizations.length > 1 ? (
           <div className="relative">
             <button
@@ -171,6 +178,35 @@ export function Topbar({ user }: TopbarProps) {
         </div>
       </div>
       </div>
+
+      {isMobileMenuOpen && (
+        <div className="absolute top-16 left-0 right-0 bg-white border-b border-border shadow-md z-40 md:hidden flex flex-col p-2 space-y-1 overflow-y-auto max-h-[calc(100vh-64px)]">
+          <Link href="/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium hover:bg-gray-100 text-foreground transition-colors">
+            <Home className="w-5 h-5 text-muted-foreground" /> Dashboard
+          </Link>
+          <Link href="/clienti" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium hover:bg-gray-100 text-foreground transition-colors">
+            <Users className="w-5 h-5 text-muted-foreground" /> Clienti
+          </Link>
+          <Link href="/fatture" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium hover:bg-gray-100 text-foreground transition-colors">
+            <FileText className="w-5 h-5 text-muted-foreground" /> Fatture
+          </Link>
+          <Link href="/scadenzario" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium hover:bg-gray-100 text-foreground transition-colors">
+            <Calendar className="w-5 h-5 text-muted-foreground" /> Scadenzario
+          </Link>
+          <Link href="/prodotti" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium hover:bg-gray-100 text-foreground transition-colors">
+            <Box className="w-5 h-5 text-muted-foreground" /> Prodotti
+          </Link>
+          <Link href="/magazzino" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium hover:bg-gray-100 text-foreground transition-colors">
+            <Package className="w-5 h-5 text-muted-foreground" /> Magazzino
+          </Link>
+          <Link href="/adempimenti-scuola" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium hover:bg-gray-100 text-foreground transition-colors">
+            <BookOpen className="w-5 h-5 text-muted-foreground" /> Invio 730 / Scuola
+          </Link>
+          <Link href="/organizzazione" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium hover:bg-gray-100 text-foreground transition-colors">
+            <Building2 className="w-5 h-5 text-muted-foreground" /> Organizzazione
+          </Link>
+        </div>
+      )}
     </header>
   );
 }

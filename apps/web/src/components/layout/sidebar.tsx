@@ -71,7 +71,7 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="fixed left-0 top-0 z-40 flex h-screen w-[var(--sidebar-width)] flex-col bg-[#F7F7F7]">
+    <aside className="hidden md:flex fixed left-0 top-0 z-40 h-screen w-[var(--sidebar-width)] flex-col bg-[#F7F7F7]">
       {/* Logo */}
       <div className="flex h-16 items-center px-5">
         <Logo />
