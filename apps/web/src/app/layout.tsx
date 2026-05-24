@@ -12,7 +12,7 @@ const inter = Inter({
 const sfPro = localFont({
   src: [
     {
-      path: '../../public/SFPRODISPLAYREGULAR.OTF',
+      path: '../../public/SFPRODISPLAYREGULAR.otf',
       weight: '400',
       style: 'normal',
     },
