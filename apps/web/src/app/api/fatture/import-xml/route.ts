@@ -20,7 +20,31 @@ export async function POST(req: NextRequest) {
 
     const arrayBuffer = await file.arrayBuffer();
     const decoder = new TextDecoder('utf-8');
-    const xmlContent = decoder.decode(arrayBuffer);
+    let xmlContent = decoder.decode(arrayBuffer);
+
+    // Gestione file P7M (estrazione dell'XML dai dati binari)
+    const startIndex = xmlContent.indexOf('<?xml');
+    const fallbackStartIndex = xmlContent.indexOf('<p:FatturaElettronica') !== -1 ? xmlContent.indexOf('<p:FatturaElettronica') : xmlContent.indexOf('<FatturaElettronica');
+    
+    const actualStart = startIndex !== -1 ? startIndex : fallbackStartIndex;
+    
+    if (actualStart !== -1) {
+      const endTags = ['</FatturaElettronica>', '</p:FatturaElettronica>', '</ns2:FatturaElettronica>', '</ns3:FatturaElettronica>'];
+      let actualEnd = -1;
+      let tagLength = 0;
+      
+      for (const tag of endTags) {
+        const idx = xmlContent.lastIndexOf(tag);
+        if (idx > actualEnd) {
+          actualEnd = idx;
+          tagLength = tag.length;
+        }
+      }
+      
+      if (actualEnd !== -1) {
+        xmlContent = xmlContent.substring(actualStart, actualEnd + tagLength);
+      }
+    }
 
     const parser = new XMLParser({
       ignoreAttributes: false,
