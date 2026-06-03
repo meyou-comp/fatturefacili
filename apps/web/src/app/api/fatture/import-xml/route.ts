@@ -49,9 +49,9 @@ export async function POST(req: NextRequest) {
     // In questo caso importiamo la fattura con il Cliente = CessionarioCommittente
     const committente = header.CessionarioCommittente?.DatiAnagrafici || {};
     const anagraficaCommittente = committente.Anagrafica || {};
-    const pIva = committente.IdFiscaleIVA?.IdCodice || '';
-    const cf = committente.CodiceFiscale || '';
-    const ragioneSociale = anagraficaCommittente.Denominazione || `${anagraficaCommittente.Nome || ''} ${anagraficaCommittente.Cognome || ''}`.trim() || 'Cliente Sconosciuto';
+    const pIva = String(committente.IdFiscaleIVA?.IdCodice || '').trim();
+    const cf = String(committente.CodiceFiscale || '').trim();
+    const ragioneSociale = String(anagraficaCommittente.Denominazione || `${anagraficaCommittente.Nome || ''} ${anagraficaCommittente.Cognome || ''}`).trim() || 'Cliente Sconosciuto';
 
     // Cerchiamo il cliente esistente per PIVA o CF nell'org
     let cliente = await prisma.cliente.findFirst({
