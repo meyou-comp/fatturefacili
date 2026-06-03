@@ -31,9 +31,13 @@ interface FatturaPDFData {
     cap: string;
     comune: string;
     provincia: string;
+    provincia: string;
     piano: string;
     logoUrl: string | null;
     coloreAccento: string | null;
+    iban: string | null;
+    bic: string | null;
+    intestatarioConto: string | null;
   };
   righe: Array<{
     descrizione: string;
@@ -152,6 +156,13 @@ export async function generateFatturaPDF(fattura: FatturaPDFData) {
     ]),
     theme: 'striped',
     headStyles: { fillColor: coloreAccento }, // Colore personalizzato
+    columnStyles: {
+      0: { cellWidth: 'auto' }, // Descrizione
+      1: { halign: 'center', minCellWidth: 15 }, // Qtà
+      2: { halign: 'right', minCellWidth: 25 }, // Prezzo
+      3: { halign: 'center', minCellWidth: 15 }, // IVA
+      4: { halign: 'right', minCellWidth: 30 } // Totale
+    },
   });
 
   // Totali
@@ -179,6 +190,24 @@ export async function generateFatturaPDF(fattura: FatturaPDFData) {
   doc.setFontSize(12);
   doc.text(`Totale Documento:`, 160, finalY + offset, { align: 'right' });
   doc.text(`€ ${fattura.nettoAPagare.toFixed(2)}`, 195, finalY + offset, { align: 'right' });
+
+  // Dettagli di Pagamento (in basso a sinistra)
+  if (org.iban) {
+    let payY = finalY;
+    doc.setFontSize(10);
+    doc.setTextColor(coloreAccento);
+    doc.text('Coordinate Bancarie per il Pagamento:', 14, payY);
+    doc.setTextColor('#000000');
+    doc.text(`IBAN: ${org.iban}`, 14, payY + 6);
+    if (org.bic) {
+      doc.text(`BIC/SWIFT: ${org.bic}`, 14, payY + 11);
+      if (org.intestatarioConto) {
+        doc.text(`Intestatario: ${org.intestatarioConto}`, 14, payY + 16);
+      }
+    } else if (org.intestatarioConto) {
+      doc.text(`Intestatario: ${org.intestatarioConto}`, 14, payY + 11);
+    }
+  }
 
   // Branding Footer per Piano BASE
   if (isBasePlan) {
