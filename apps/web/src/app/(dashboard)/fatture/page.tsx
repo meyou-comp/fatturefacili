@@ -63,11 +63,11 @@ export default function FatturePage() {
         setFatture((prev) => prev.filter((f) => f.id !== fatturaToDelete));
       } else {
         const err = await res.json();
-        alert(err.error || 'Errore durante l\\'eliminazione');
+        alert(err.error || "Errore durante l'eliminazione");
       }
     } catch (e) {
       console.error(e);
-      alert('Errore durante l\\'eliminazione');
+      alert("Errore durante l'eliminazione");
     } finally {
       setFatturaToDelete(null);
     }
