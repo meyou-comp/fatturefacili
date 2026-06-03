@@ -28,8 +28,10 @@ export async function GET(
   // Questa è una versione Semplificata dello Standard FatturaPA.
   // In una vera implementazione di fatturazione elettronica in Italia,
   // l'XML richiede molti più dettagli fiscali, certificati e tag precisi.
+  const versioneFattura = cliente.tipoCliente === 'PA' ? 'FPA12' : 'FPR12';
+
   const xmlData = `<?xml version="1.0" encoding="UTF-8"?>
-<p:FatturaElettronica xmlns:p="http://ivaservizi.agenziaentrate.gov.it/docs/xsd/fatture/v1.2">
+<p:FatturaElettronica versione="${versioneFattura}" xmlns:p="http://ivaservizi.agenziaentrate.gov.it/docs/xsd/fatture/v1.2">
   <FatturaElettronicaHeader>
     <DatiTrasmissione>
       <IdTrasmittente>
