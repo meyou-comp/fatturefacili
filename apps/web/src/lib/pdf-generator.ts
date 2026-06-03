@@ -31,7 +31,6 @@ interface FatturaPDFData {
     cap: string;
     comune: string;
     provincia: string;
-    provincia: string;
     piano: string;
     logoUrl: string | null;
     coloreAccento: string | null;
