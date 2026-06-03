@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma, getSession } from '@/lib/auth';
 import { XMLParser } from 'fast-xml-parser';
 
+const safeParseFloat = (val: any) => {
+  const parsed = parseFloat(String(val || '0'));
+  return isNaN(parsed) ? 0 : parsed;
+};
+
 export async function POST(req: NextRequest) {
   const session = await getSession();
   if (!session) return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
@@ -78,7 +83,7 @@ export async function POST(req: NextRequest) {
     const datiGenerali = body.DatiGenerali?.DatiGeneraliDocumento || {};
     const numero = typeof datiGenerali.Numero === 'string' ? datiGenerali.Numero : String(datiGenerali.Numero || 'N/D');
     const dataEmissione = datiGenerali.Data ? new Date(datiGenerali.Data) : new Date();
-    const importoTotale = parseFloat(datiGenerali.ImportoTotaleDocumento || '0');
+    const importoTotale = safeParseFloat(datiGenerali.ImportoTotaleDocumento);
 
     // Dati Riepilogo
     let imponibile = 0;
@@ -86,8 +91,8 @@ export async function POST(req: NextRequest) {
     const riepilogo = body.DatiBeniServizi?.DatiRiepilogo;
     const arrayRiepilogo = Array.isArray(riepilogo) ? riepilogo : (riepilogo ? [riepilogo] : []);
     for (const r of arrayRiepilogo) {
-      imponibile += parseFloat(r.ImponibileImporto || '0');
-      totaleIVA += parseFloat(r.Imposta || '0');
+      imponibile += safeParseFloat(r.ImponibileImporto);
+      totaleIVA += safeParseFloat(r.Imposta);
     }
 
     // Righe
@@ -98,10 +103,10 @@ export async function POST(req: NextRequest) {
       return {
         ordine: parseInt(l.NumeroLinea) || 1,
         descrizione: String(l.Descrizione || ''),
-        quantita: parseFloat(l.Quantita || '1'),
-        prezzoUnitario: parseFloat(l.PrezzoUnitario || '0'),
-        imponibile: parseFloat(l.PrezzoTotale || '0'),
-        aliquotaIVA: parseFloat(l.AliquotaIVA || '22'),
+        quantita: safeParseFloat(l.Quantita || '1'),
+        prezzoUnitario: safeParseFloat(l.PrezzoUnitario),
+        imponibile: safeParseFloat(l.PrezzoTotale),
+        aliquotaIVA: safeParseFloat(l.AliquotaIVA || '22'),
       };
     });
 
@@ -128,6 +133,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(nuovaFattura, { status: 201 });
   } catch (error) {
     console.error('Errore importazione XML:', error);
-    return NextResponse.json({ error: 'Errore durante l\'importazione del file XML' }, { status: 500 });
+    const msg = error instanceof Error ? error.message : String(error);
+    return NextResponse.json({ error: 'Errore durante l\'importazione del file XML: ' + msg }, { status: 500 });
   }
 }
