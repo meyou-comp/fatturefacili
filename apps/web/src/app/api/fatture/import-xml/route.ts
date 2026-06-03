@@ -20,6 +20,7 @@ export async function POST(req: NextRequest) {
     const parser = new XMLParser({
       ignoreAttributes: false,
       attributeNamePrefix: '@_',
+      removeNSPrefix: true,
     });
     const result = parser.parse(xmlContent);
 
@@ -41,11 +42,11 @@ export async function POST(req: NextRequest) {
     // Estrarre Cliente (CessionarioCommittente o CedentePrestatore se passiva, assumiamo attiva/passiva generica)
     // Per un'importazione generica, prendiamo il CedentePrestatore come Fornitore e CessionarioCommittente come Cliente.
     // In questo caso importiamo la fattura con il Cliente = CessionarioCommittente
-    const committente = header.CessionarioCommittente.DatiAnagrafici;
-    const anagraficaCommittente = committente.Anagrafica;
+    const committente = header.CessionarioCommittente?.DatiAnagrafici || {};
+    const anagraficaCommittente = committente.Anagrafica || {};
     const pIva = committente.IdFiscaleIVA?.IdCodice || '';
     const cf = committente.CodiceFiscale || '';
-    const ragioneSociale = anagraficaCommittente.Denominazione || `${anagraficaCommittente.Nome} ${anagraficaCommittente.Cognome}`;
+    const ragioneSociale = anagraficaCommittente.Denominazione || `${anagraficaCommittente.Nome || ''} ${anagraficaCommittente.Cognome || ''}`.trim() || 'Cliente Sconosciuto';
 
     // Cerchiamo il cliente esistente per PIVA o CF nell'org
     let cliente = await prisma.cliente.findFirst({
@@ -74,15 +75,15 @@ export async function POST(req: NextRequest) {
     }
 
     // Dati Generali
-    const datiGenerali = body.DatiGenerali.DatiGeneraliDocumento;
-    const numero = typeof datiGenerali.Numero === 'string' ? datiGenerali.Numero : String(datiGenerali.Numero);
-    const dataEmissione = new Date(datiGenerali.Data);
+    const datiGenerali = body.DatiGenerali?.DatiGeneraliDocumento || {};
+    const numero = typeof datiGenerali.Numero === 'string' ? datiGenerali.Numero : String(datiGenerali.Numero || 'N/D');
+    const dataEmissione = datiGenerali.Data ? new Date(datiGenerali.Data) : new Date();
     const importoTotale = parseFloat(datiGenerali.ImportoTotaleDocumento || '0');
 
     // Dati Riepilogo
     let imponibile = 0;
     let totaleIVA = 0;
-    const riepilogo = body.DatiBeniServizi.DatiRiepilogo;
+    const riepilogo = body.DatiBeniServizi?.DatiRiepilogo;
     const arrayRiepilogo = Array.isArray(riepilogo) ? riepilogo : (riepilogo ? [riepilogo] : []);
     for (const r of arrayRiepilogo) {
       imponibile += parseFloat(r.ImponibileImporto || '0');
@@ -90,7 +91,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Righe
-    const dettaglioLinee = body.DatiBeniServizi.DettaglioLinee;
+    const dettaglioLinee = body.DatiBeniServizi?.DettaglioLinee;
     const arrayLinee = Array.isArray(dettaglioLinee) ? dettaglioLinee : (dettaglioLinee ? [dettaglioLinee] : []);
     
     const righeCreate = arrayLinee.map((l: any) => {
