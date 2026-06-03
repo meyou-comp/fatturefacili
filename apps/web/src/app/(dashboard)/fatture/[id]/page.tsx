@@ -13,7 +13,7 @@ interface Fattura {
   importoRitenuta: number | null; importoBollo: number | null; importoCassa: number | null;
   metodoPagamento: string | null; oggettoFattura: string | null; note: string | null;
   cliente: { ragioneSociale: string | null; nome: string | null; cognome: string | null; partitaIva: string | null; codiceFiscale: string | null; indirizzo: string | null; cap: string | null; comune: string | null; provincia: string | null; paese: string | null; };
-  organization: { ragioneSociale: string; partitaIva: string | null; codiceFiscale: string; indirizzo: string; cap: string; comune: string; provincia: string; piano: string; logoUrl: string | null; coloreAccento: string | null; };
+  organization: { ragioneSociale: string; partitaIva: string | null; codiceFiscale: string; indirizzo: string; cap: string; comune: string; provincia: string; piano: string; logoUrl: string | null; coloreAccento: string | null; iban: string | null; bic: string | null; intestatarioConto: string | null; };
   righe: Array<{ id: string; ordine: number; descrizione: string; quantita: number; prezzoUnitario: number; aliquotaIVA: number; sconto: number | null; imponibile: number; importoIVA: number; totale: number; }>;
   pagamenti: Array<{ id: string; data: string; importo: number; metodo: string; riferimento: string | null; }>;
 }
