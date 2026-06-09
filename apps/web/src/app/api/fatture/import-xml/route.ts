@@ -68,16 +68,48 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Struttura FatturaPA incompleta' }, { status: 400 });
     }
 
-    // Estrarre Cliente (CessionarioCommittente o CedentePrestatore se passiva, assumiamo attiva/passiva generica)
-    // Per un'importazione generica, prendiamo il CedentePrestatore come Fornitore e CessionarioCommittente come Cliente.
-    // In questo caso importiamo la fattura con il Cliente = CessionarioCommittente
-    const committente = header.CessionarioCommittente?.DatiAnagrafici || {};
-    const anagraficaCommittente = committente.Anagrafica || {};
-    const pIva = String(committente.IdFiscaleIVA?.IdCodice || '').trim();
-    const cf = String(committente.CodiceFiscale || '').trim();
-    const ragioneSociale = String(anagraficaCommittente.Denominazione || `${anagraficaCommittente.Nome || ''} ${anagraficaCommittente.Cognome || ''}`).trim() || 'Cliente Sconosciuto';
+    const org = await prisma.organization.findUnique({ where: { id: session.orgId } });
 
-    // Cerchiamo il cliente esistente per PIVA o CF nell'org
+    const cedente = header.CedentePrestatore?.DatiAnagrafici || {};
+    const committente = header.CessionarioCommittente?.DatiAnagrafici || {};
+
+    const cedentePIva = String(cedente.IdFiscaleIVA?.IdCodice || '').trim();
+    const cedenteCf = String(cedente.CodiceFiscale || '').trim();
+
+    const committentePIva = String(committente.IdFiscaleIVA?.IdCodice || '').trim();
+    const committenteCf = String(committente.CodiceFiscale || '').trim();
+
+    // Determina se l'organizzazione è il cliente o il fornitore
+    const isCommittente = 
+      (org?.partitaIva && org.partitaIva === committentePIva) || 
+      (org?.codiceFiscale && org.codiceFiscale === committenteCf);
+
+    const isCedente = 
+      (org?.partitaIva && org.partitaIva === cedentePIva) || 
+      (org?.codiceFiscale && org.codiceFiscale === cedenteCf);
+
+    let direzione = 'USCITA';
+    let controparteAnagrafica;
+    let pIva = '';
+    let cf = '';
+
+    if (isCommittente && !isCedente) {
+      // Fattura passiva (acquisto/spesa)
+      direzione = 'ENTRATA';
+      controparteAnagrafica = cedente.Anagrafica || {};
+      pIva = cedentePIva;
+      cf = cedenteCf;
+    } else {
+      // Fattura attiva (vendita)
+      direzione = 'USCITA';
+      controparteAnagrafica = committente.Anagrafica || {};
+      pIva = committentePIva;
+      cf = committenteCf;
+    }
+
+    const ragioneSociale = String(controparteAnagrafica.Denominazione || `${controparteAnagrafica.Nome || ''} ${controparteAnagrafica.Cognome || ''}`).trim() || 'Soggetto Sconosciuto';
+
+    // Cerchiamo il cliente/fornitore esistente per PIVA o CF nell'org
     let cliente = await prisma.cliente.findFirst({
       where: {
         organizationId: session.orgId,
@@ -94,9 +126,9 @@ export async function POST(req: NextRequest) {
         data: {
           organizationId: session.orgId,
           tipoCliente: pIva ? 'AZIENDA' : 'PRIVATO',
-          ragioneSociale: anagraficaCommittente.Denominazione || null,
-          nome: anagraficaCommittente.Nome || null,
-          cognome: anagraficaCommittente.Cognome || null,
+          ragioneSociale: controparteAnagrafica.Denominazione || null,
+          nome: controparteAnagrafica.Nome || null,
+          cognome: controparteAnagrafica.Cognome || null,
           partitaIva: pIva || null,
           codiceFiscale: cf || null,
         }
@@ -141,7 +173,7 @@ export async function POST(req: NextRequest) {
         numero,
         progressivo: 0,
         tipoDocumento: 'FATTURA',
-        direzione: 'USCITA', // O ENTRATA a seconda del senso. Default uscita.
+        direzione,
         dataEmissione,
         stato: 'BOZZA', // Salviamo in bozza per revisione
         imponibile,

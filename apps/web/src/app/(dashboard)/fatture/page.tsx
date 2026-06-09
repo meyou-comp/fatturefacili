@@ -13,6 +13,7 @@ interface Fattura {
   nettoAPagare: number;
   stato: string;
   tipoDocumento: string;
+  direzione: string;
   dataEmissione: string;
   metodoPagamento: string | null;
   cliente: { ragioneSociale: string | null; nome: string | null; cognome: string | null };
@@ -160,7 +161,7 @@ export default function FatturePage() {
             <tbody>
               {fatture.map((inv) => {
                 const badge = statoBadge[inv.stato] || statoBadge.BOZZA;
-                const isNeg = inv.tipoDocumento === 'NOTA_CREDITO';
+                const isNeg = inv.tipoDocumento === 'NOTA_CREDITO' || inv.direzione === 'ENTRATA';
                 const importo = isNeg ? -inv.totale : inv.totale;
                 return (
                   <tr key={inv.id} className="border-t border-border hover:bg-muted/30 cursor-pointer" onClick={() => window.location.href = `/fatture/${inv.id}`}>
