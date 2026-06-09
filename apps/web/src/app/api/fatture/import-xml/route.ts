@@ -73,39 +73,74 @@ export async function POST(req: NextRequest) {
     const cedente = header.CedentePrestatore?.DatiAnagrafici || {};
     const committente = header.CessionarioCommittente?.DatiAnagrafici || {};
 
-    const cedentePIva = String(cedente.IdFiscaleIVA?.IdCodice || '').trim();
-    const cedenteCf = String(cedente.CodiceFiscale || '').trim();
+    // Funzione di normalizzazione: rimuove spazi, punti, trattini e converte in uppercase
+    const normalize = (val: string | null | undefined): string =>
+      String(val || '').replace(/[\s.\-]/g, '').toUpperCase().trim();
 
-    const committentePIva = String(committente.IdFiscaleIVA?.IdCodice || '').trim();
-    const committenteCf = String(committente.CodiceFiscale || '').trim();
+    const cedentePIva = normalize(cedente.IdFiscaleIVA?.IdCodice);
+    const cedenteCf = normalize(cedente.CodiceFiscale);
+    const cedenteNome = normalize(
+      cedente.Anagrafica?.Denominazione ||
+      `${cedente.Anagrafica?.Nome || ''} ${cedente.Anagrafica?.Cognome || ''}`
+    );
 
-    // Determina se l'organizzazione è il cliente o il fornitore
-    const isCommittente = 
-      (org?.partitaIva && org.partitaIva === committentePIva) || 
-      (org?.codiceFiscale && org.codiceFiscale === committenteCf);
+    const committentePIva = normalize(committente.IdFiscaleIVA?.IdCodice);
+    const committenteCf = normalize(committente.CodiceFiscale);
+    const committenteNome = normalize(
+      committente.Anagrafica?.Denominazione ||
+      `${committente.Anagrafica?.Nome || ''} ${committente.Anagrafica?.Cognome || ''}`
+    );
 
-    const isCedente = 
-      (org?.partitaIva && org.partitaIva === cedentePIva) || 
-      (org?.codiceFiscale && org.codiceFiscale === cedenteCf);
+    const orgPIva = normalize(org?.partitaIva);
+    const orgCf = normalize(org?.codiceFiscale);
+    const orgNome = normalize(org?.ragioneSociale);
 
-    let direzione = 'USCITA';
+    console.log('[Import XML] Org:', { piva: orgPIva, cf: orgCf, nome: orgNome });
+    console.log('[Import XML] Cedente:', { piva: cedentePIva, cf: cedenteCf, nome: cedenteNome });
+    console.log('[Import XML] Committente:', { piva: committentePIva, cf: committenteCf, nome: committenteNome });
+
+    // Determina se l'organizzazione è il committente (chi riceve la fattura) o il cedente (chi la emette)
+    const isCommittente =
+      (orgPIva && orgPIva === committentePIva) ||
+      (orgCf && orgCf === committenteCf) ||
+      (orgNome && orgNome === committenteNome);
+
+    const isCedente =
+      (orgPIva && orgPIva === cedentePIva) ||
+      (orgCf && orgCf === cedenteCf) ||
+      (orgNome && orgNome === cedenteNome);
+
+    console.log('[Import XML] Match:', { isCommittente, isCedente });
+
+    let direzione: string;
     let controparteAnagrafica;
     let pIva = '';
     let cf = '';
 
     if (isCommittente && !isCedente) {
-      // Fattura passiva (acquisto/spesa)
+      // Noi siamo il committente (chi compra) → fattura passiva → è una spesa/uscita di denaro
       direzione = 'ENTRATA';
       controparteAnagrafica = cedente.Anagrafica || {};
-      pIva = cedentePIva;
-      cf = cedenteCf;
-    } else {
-      // Fattura attiva (vendita)
+      pIva = String(cedente.IdFiscaleIVA?.IdCodice || '').trim();
+      cf = String(cedente.CodiceFiscale || '').trim();
+    } else if (isCedente && !isCommittente) {
+      // Noi siamo il cedente (chi vende) → fattura attiva → è un'entrata di denaro
       direzione = 'USCITA';
       controparteAnagrafica = committente.Anagrafica || {};
-      pIva = committentePIva;
-      cf = committenteCf;
+      pIva = String(committente.IdFiscaleIVA?.IdCodice || '').trim();
+      cf = String(committente.CodiceFiscale || '').trim();
+    } else {
+      // Fallback: non riusciamo a determinare → default USCITA
+      console.warn('[Import XML] Impossibile determinare direzione, default USCITA');
+      direzione = 'USCITA';
+      controparteAnagrafica = committente.Anagrafica || {};
+      pIva = String(committente.IdFiscaleIVA?.IdCodice || '').trim();
+      cf = String(committente.CodiceFiscale || '').trim();
     }
+
+    console.log('[Import XML] Direzione:', direzione);
+
+
 
     const ragioneSociale = String(controparteAnagrafica.Denominazione || `${controparteAnagrafica.Nome || ''} ${controparteAnagrafica.Cognome || ''}`).trim() || 'Soggetto Sconosciuto';
 
