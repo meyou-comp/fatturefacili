@@ -1,19 +1,33 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import { Logo } from '@/components/shared/logo';
 import { auth } from '@/lib/firebase';
 import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isAdmin = searchParams.get('admin') === 'giacomo123';
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    // Se non è l'amministratore (Giacomo) con la chiave corretta, butta fuori
+    if (!isAdmin) {
+      router.push('/waitlist');
+    }
+  }, [isAdmin, router]);
+
+  if (!isAdmin) {
+    return <div className="min-h-screen bg-white" />; // Schermata bianca mentre reindirizza
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -160,7 +174,7 @@ export default function LoginPage() {
           Accedi con Google
         </button>
 
-        <p className="text-center text-[12px] text-muted-foreground">
+        <p className="text-center text-[12px] text-muted-foreground hidden">
           Non hai un account?{' '}
           <a href="/register" className="font-medium text-primary-dark hover:underline">
             Registrati
@@ -168,5 +182,13 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-white" />}>
+      <LoginContent />
+    </Suspense>
   );
 }

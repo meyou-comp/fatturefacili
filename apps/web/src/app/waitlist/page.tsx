@@ -2,9 +2,8 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { db } from '@/lib/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import RealismButton from '@/components/ui/shiny-borders-button';
+import { Turnstile } from '@marsidev/react-turnstile';
+import { submitWaitlistAction } from './actions';
 
 function LogoSVG() {
   return (
@@ -32,23 +31,45 @@ function LogoSVG() {
 export default function WaitlistPage() {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  
+  // Questa è la chiave SITE (pubblica) di Turnstile.
+  // Devi assicurarti che NEXT_PUBLIC_TURNSTILE_SITE_KEY sia nel tuo .env.local
+  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '1x00000000000000000000AA'; // Dummy key for testing locally if not set
+
   const sfPro = "var(--font-sfpro), Inter, sans-serif";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !email.includes('@')) return;
+    
+    // Controlla che il token sia stato generato
+    if (!turnstileToken) {
+      setStatus('error');
+      setErrorMessage("Per favore, completa la verifica anti-bot.");
+      return;
+    }
 
     setStatus('loading');
+    setErrorMessage('');
+    
     try {
-      await addDoc(collection(db, 'waitlist'), {
-        email,
-        createdAt: serverTimestamp()
-      });
-      setStatus('success');
-      setEmail('');
+      // Invia tutto al server
+      const res = await submitWaitlistAction(email, turnstileToken);
+      
+      if (res.success) {
+        setStatus('success');
+        setEmail('');
+      } else {
+        console.error("Errore server action:", res.error);
+        setStatus('error');
+        setErrorMessage(res.error || "Si è verificato un errore misterioso.");
+      }
     } catch (error) {
       console.error("Error adding to waitlist", error);
       setStatus('error');
+      setErrorMessage("Impossibile connettersi al server. Riprova più tardi.");
     }
   };
 
@@ -83,7 +104,7 @@ export default function WaitlistPage() {
               <h2 style={{ fontFamily: sfPro }} className="text-3xl font-semibold mb-3">Sei in lista!</h2>
               <p className="text-black/70 mb-6">Grazie per il tuo interesse. Ti avviseremo non appena Fatture Facili riaprirà i battenti.</p>
               <button
-                onClick={() => setStatus('idle')}
+                onClick={() => { setStatus('idle'); setTurnstileToken(null); }}
                 className="text-[14px] font-bold text-black hover:opacity-70 transition-all underline"
               >
                 Registra un'altra email
@@ -113,17 +134,29 @@ export default function WaitlistPage() {
                   />
                 </div>
                 
+                <div className="flex justify-center my-2">
+                  <Turnstile 
+                    siteKey={siteKey}
+                    onSuccess={(token) => {
+                      setTurnstileToken(token);
+                      setErrorMessage('');
+                    }}
+                    onError={() => setErrorMessage("Errore Turnstile. Ricarica la pagina.")}
+                    options={{ theme: 'light' }}
+                  />
+                </div>
+                
                 <button
                   type="submit"
-                  disabled={status === 'loading'}
-                  className="w-full flex items-center justify-center bg-[#ABF88D] text-[#335525] hover:opacity-90 transition-all font-bold text-[15px] disabled:opacity-50"
+                  disabled={status === 'loading' || !turnstileToken}
+                  className="w-full flex items-center justify-center bg-[#ABF88D] text-[#335525] hover:opacity-90 transition-all font-bold text-[15px] disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{ height: 54, borderRadius: 14 }}
                 >
-                  {status === 'loading' ? 'Salvataggio...' : 'Iscriviti ora'}
+                  {status === 'loading' ? 'Salvataggio in corso...' : 'Iscriviti ora'}
                 </button>
 
                 {status === 'error' && (
-                  <p className="text-red-500 text-sm mt-2">Ops! Si è verificato un errore. Riprova più tardi.</p>
+                  <p className="text-red-500 text-[13px] font-medium mt-2">{errorMessage}</p>
                 )}
               </form>
             </div>

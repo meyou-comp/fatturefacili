@@ -111,8 +111,8 @@ export default function LandingPage() {
               <Link href="/waitlist">
                 <RealismButton 
                   text="Unisciti alla Waitlist" 
-                  className="px-4 h-[38px]" 
-                  innerClassName="text-[13px] font-medium" 
+                  className="px-4 w-auto h-[38px] whitespace-nowrap" 
+                  innerClassName="text-[13px] font-medium px-4" 
                 />
               </Link>
             </div>
@@ -131,8 +131,8 @@ export default function LandingPage() {
               <Link href="/waitlist">
                 <RealismButton 
                   text="Unisciti alla Waitlist" 
-                  className="px-6 h-[50px]" 
-                  innerClassName="text-[15px] font-bold" 
+                  className="px-6 w-auto h-[50px] whitespace-nowrap" 
+                  innerClassName="text-[15px] font-bold px-4" 
                 />
               </Link>
               <a href="#pricing" className="flex items-center justify-center bg-[#ABF88D] text-[#335525] hover:opacity-90 transition-all font-bold text-[15px]" style={{ height: 50, width: 130, borderRadius: 14 }}>
