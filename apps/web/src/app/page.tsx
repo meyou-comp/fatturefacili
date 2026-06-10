@@ -108,10 +108,10 @@ export default function LandingPage() {
               style={{ height: 66, borderRadius: 24, border: '1px solid rgba(0,0,0,0.20)', background: '#FFF' }}
             >
               <LogoSVG />
-              <Link href="/login">
+              <Link href="/waitlist">
                 <RealismButton 
-                  text="Accedi" 
-                  className="w-[95px] h-[38px]" 
+                  text="Unisciti alla Waitlist" 
+                  className="px-4 h-[38px]" 
                   innerClassName="text-[13px] font-medium" 
                 />
               </Link>
@@ -128,10 +128,10 @@ export default function LandingPage() {
             </p>
 
             <div className="mt-8 flex justify-center gap-3">
-              <Link href="/login">
+              <Link href="/waitlist">
                 <RealismButton 
-                  text="Accedi" 
-                  className="w-[130px] h-[50px]" 
+                  text="Unisciti alla Waitlist" 
+                  className="px-6 h-[50px]" 
                   innerClassName="text-[15px] font-bold" 
                 />
               </Link>
@@ -251,11 +251,11 @@ export default function LandingPage() {
 
                   <div className="mt-10 flex justify-center">
                     <Link
-                      href={`/register?plan=${plan.id}&cycle=${billingCycle}`}
+                      href="/waitlist"
                       className="flex items-center justify-center text-[13px] font-bold text-black hover:opacity-90 transition-all"
                       style={{ width: 191, height: 40, padding: '8px 10px', borderRadius: 10, background: '#ABF88D', gap: 8 }}
                     >
-                      Registrati
+                      Unisciti alla Waitlist
                     </Link>
                   </div>
                 </div>
@@ -271,11 +271,11 @@ export default function LandingPage() {
             </div>
             <div className="mt-6 md:mt-0">
               <Link
-                href="/login"
+                href="/waitlist"
                 className="flex items-center justify-center text-[13px] font-bold text-black hover:opacity-90 transition-all"
                 style={{ width: 191, height: 40, padding: '8px 10px', borderRadius: 10, background: '#ABF88D', gap: 8 }}
               >
-                Contattaci
+                Unisciti alla Waitlist
               </Link>
             </div>
           </div>
