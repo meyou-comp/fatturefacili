@@ -4,7 +4,7 @@ import { useRef, useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
-import RealismButton from '@/components/ui/shiny-borders-button';
+import WaitlistButton from '@/components/ui/waitlist-button';
 
 /* ── Logo SVG ─────────────────────────────────────────────── */
 function LogoSVG() {
@@ -109,10 +109,8 @@ export default function LandingPage() {
             >
               <LogoSVG />
               <Link href="/waitlist">
-                <RealismButton 
+                <WaitlistButton 
                   text="Unisciti alla Waitlist" 
-                  className="px-4 w-auto h-[38px] whitespace-nowrap" 
-                  innerClassName="text-[13px] font-medium px-4" 
                 />
               </Link>
             </div>
@@ -129,10 +127,9 @@ export default function LandingPage() {
 
             <div className="mt-8 flex justify-center gap-3">
               <Link href="/waitlist">
-                <RealismButton 
+                <WaitlistButton 
                   text="Unisciti alla Waitlist" 
-                  className="px-6 w-auto h-[50px] whitespace-nowrap" 
-                  innerClassName="text-[15px] font-bold px-4" 
+                  className="h-[50px] !p-[3px]" 
                 />
               </Link>
               <a href="#pricing" className="flex items-center justify-center bg-[#ABF88D] text-[#335525] hover:opacity-90 transition-all font-bold text-[15px]" style={{ height: 50, width: 130, borderRadius: 14 }}>
