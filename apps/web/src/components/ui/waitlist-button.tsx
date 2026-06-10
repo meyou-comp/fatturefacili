@@ -7,7 +7,7 @@ interface WaitlistButtonProps {
 
 const WaitlistButton: React.FC<WaitlistButtonProps> = ({ text = "Unisciti alla Waitlist", className }) => {
   return (
-    <button className={`group relative p-[2px] rounded-[14px] border-none cursor-pointer bg-[radial-gradient(circle_80px_at_80%_-10%,_#ffffff,_#181b1b)] transition-all flex items-center justify-center px-4 w-auto h-[38px] whitespace-nowrap ${className || ''}`}>
+    <button className={`group relative p-[2px] rounded-[14px] border-none cursor-pointer bg-[radial-gradient(circle_80px_at_80%_-10%,_#ffffff,_#181b1b)] transition-all flex items-center justify-center w-auto whitespace-nowrap ${className || 'h-[38px]'}`}>
       {/* Glow behind button */}
       <div className="absolute top-0 right-0 w-[65%] h-[60%] rounded-[120px] shadow-[0_0_20px_#ffffff38] group-hover:shadow-[0_0_40px_#ffffff60] transition-all duration-300 ease-out -z-10" />
 
@@ -18,11 +18,11 @@ const WaitlistButton: React.FC<WaitlistButtonProps> = ({ text = "Unisciti alla W
         group-hover:w-[90px] group-hover:shadow-[-4px_1px_45px_#00ff2d60]" />
 
       {/* Inner content */}
-      <div className="relative px-[25px] py-[14px] group-hover:scale-110 rounded-[14px] text-white bg-[radial-gradient(circle_80px_at_80%_-50%,_#777777,_#0f1111)] z-10 transition-all duration-300 flex items-center justify-center w-full h-full">
+      <div className="relative px-4 group-hover:scale-105 rounded-[12px] text-white bg-[radial-gradient(circle_80px_at_80%_-50%,_#777777,_#0f1111)] z-10 transition-all duration-300 flex items-center justify-center w-full h-full text-[13px] font-medium tracking-wide">
         {text}
 
         {/* Inner glow layer */}
-        <div className="absolute inset-0 rounded-[14px] bg-[radial-gradient(circle_60px_at_0%_100%,_#00e1ff1a,_#0000ff11,_transparent)] z-[-1]" />
+        <div className="absolute inset-0 rounded-[12px] bg-[radial-gradient(circle_60px_at_0%_100%,_#00e1ff1a,_#0000ff11,_transparent)] z-[-1]" />
       </div>
     </button>
   );
