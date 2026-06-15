@@ -104,7 +104,7 @@ export async function GET(
         <Descrizione>${r.descrizione}</Descrizione>
         <Quantita>${r.quantita.toFixed(2)}</Quantita>
         <PrezzoUnitario>${r.prezzoUnitario.toFixed(2)}</PrezzoUnitario>
-        <PrezzoTotale>${r.totale.toFixed(2)}</PrezzoTotale>
+        <PrezzoTotale>${r.imponibile.toFixed(2)}</PrezzoTotale>
         <AliquotaIVA>${r.aliquotaIVA.toFixed(2)}</AliquotaIVA>
       </DettaglioLinee>
       `).join('')}
