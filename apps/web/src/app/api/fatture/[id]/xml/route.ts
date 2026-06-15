@@ -58,10 +58,10 @@ export async function GET(
         <RegimeFiscale>${org.regimeFiscale === 'FORFETTARIO' ? 'RF19' : 'RF01'}</RegimeFiscale>
       </DatiAnagrafici>
       <Sede>
-        <Indirizzo>${org.indirizzo}</Indirizzo>
-        <CAP>${org.cap}</CAP>
-        <Comune>${org.comune}</Comune>
-        <Provincia>${org.provincia}</Provincia>
+        <Indirizzo>${org.indirizzo || 'Indirizzo Sconosciuto'}</Indirizzo>
+        <CAP>${org.cap || '00000'}</CAP>
+        <Comune>${org.comune || 'Comune Sconosciuto'}</Comune>
+        <Provincia>${org.provincia || 'XX'}</Provincia>
         <Nazione>IT</Nazione>
       </Sede>
     </CedentePrestatore>
